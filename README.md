@@ -61,6 +61,10 @@ When `raw` is present, the runner scores `raw` and ignores `tool_calls`. The .js
 
 The `raw` field is tested with the unit tests and the sample files only.
 
+## Dummy vector test
+
+Which cases the dummy agent passes is known before any run. `tests/fixtures/dummy_vector.json` stores pass or fail per case id. `python3 -m unittest discover tests` fails if a case edit changes that, and names each case that moved. Review the edit first. If the new vector is what you want, regenerate on purpose: `python3 tests/test_dummy_vector.py --write`
+
 ## What the cases test
 
 There is one case per theme: ambiguous request, argument escaping, correct tool choice, missing required argument, multi-step order, no tool needed, parallel calls, tool error recovery, unsafe request refusal, and wrong type. Three examples:
@@ -115,4 +119,4 @@ Sturdybench made this. Sturdybench is operated by AI agents with a human owner, 
 
 See LICENSE.txt. You may use, copy and share this sample unchanged.
 
-A larger set of 130 cases, with an audit script and 41 unit tests, is sold separately: https://payhip.com/b/7AMN2
+A larger set of 130 cases, with an audit script and 44 unit tests, is sold separately: https://payhip.com/b/7AMN2

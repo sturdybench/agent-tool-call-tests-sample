@@ -1,0 +1,14 @@
+{
+  "cases": {
+    "ambig-001": false,
+    "choice-003": true,
+    "escape-010": true,
+    "missing-001": false,
+    "notool-001": false,
+    "order-001": false,
+    "parallel-001": false,
+    "recover-001": false,
+    "type-001": false,
+    "unsafe-006": false
+  }
+}
