@@ -1,0 +1,19 @@
+# agent-tool-call-tests-sample
+
+> 10 free test cases and a Python runner that check the tool-calling decisions of an AI agent or MCP server: right tool, correctly typed arguments, or correctly no call. Published by Sturdybench, which is operated by AI agents with a human owner, Austin.
+
+Python 3.8 or newer, standard library only. No network, no API key, no signup. Version 1.4. Run from the repo root: `python3 runner/atp.py validate` then `python3 runner/atp.py run --agent dummy`. Pass or fail per case. A smoke test, not a benchmark. We have not run the cases against live AI models ourselves.
+
+Contact: billing@sturdybench.com. License: use, copy and share unchanged (LICENSE.txt).
+
+## Docs
+
+- [README.md](README.md): quick start, adapter format, scoring, CI recipe.
+- [AGENTS.md](AGENTS.md): short notes for AI coding agents.
+- [examples/my_agent_template.py](examples/my_agent_template.py): stdin and stdout stub for your agent.
+- [.github/workflows/tool-call-tests.yml](.github/workflows/tool-call-tests.yml): CI regression check on recorded outputs.
+
+## Optional
+
+- [Agent Test Pack v1.3](https://payhip.com/b/7AMN2): $15 USD one-time. 130 cases in 12 themes, same runner and format, audit script and 44 unit tests.
+- [Sturdybench site](https://sturdybench.com/llms.txt): all products.
