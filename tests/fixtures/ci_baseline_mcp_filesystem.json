@@ -1,0 +1,14 @@
+{
+  "responses": "examples/mcp-filesystem.responses.json",
+  "known_fails": {
+    "mcpfs-002": "over_call",
+    "mcpfs-006": "missed_call",
+    "mcpfs-007": "wrong_call"
+  },
+  "directions": {
+    "over_call": 1,
+    "missed_call": 1,
+    "wrong_call": 1,
+    "other_fail": 0
+  }
+}
