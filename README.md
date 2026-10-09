@@ -1,5 +1,7 @@
 # agent-tool-call-tests-sample
 
+Version 1.4. See CHANGELOG.md.
+
 Ten test cases and a small runner that check the tool-calling decisions of an AI agent or MCP server. Each case gives your agent a conversation and a list of tools. The runner checks whether the agent called the right tool, with the right arguments, or correctly made no tool call.
 
 It needs Python 3.8 or newer and nothing else. No network, no API key, no signup.
@@ -60,6 +62,111 @@ To show the runner the original call, add an optional `raw` field next to `tool_
 When `raw` is present, the runner scores `raw` and ignores `tool_calls`. The .json report then shows `raw` and `normalized` for each case, and `"adapter_diff": true` when they differ. The check is type sensitive, so 5 and "5" differ, and 5 and 5.0 differ. The console prints `Adapter differences: N` only when at least one response had `raw`. The .md report has the same line and an "Adapter diff" note on the case row. A malformed `raw` fails that case with a reason that starts with "raw". Without `raw`, nothing changes.
 
 The `raw` field is tested with the unit tests and the sample files only.
+
+## Run in CI
+
+Version 1.4 adds a regression check that runs on every pull request and push. It scores recorded agent outputs, so it calls no model, needs no API key and uses no secrets. The only network use is installing pytest.
+
+The workflow is in `.github/workflows/tool-call-tests.yml`. To use it in your own repo, copy that file, `runner/`, `cases/`, `tests/` and `pytest.ini`. The workflow:
+
+```yaml
+name: tool-call-tests
+on:
+  pull_request:
+  push:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pytest
+        run: python -m pip install pytest
+      - name: Validate case files
+        run: python runner/atp.py validate
+      - name: Run tests
+        run: python -m pytest -v
+```
+
+Run the same check on your machine:
+
+```
+python3 -m pip install pytest
+python3 -m pytest -v
+```
+
+`tests/test_ci_recorded.py` makes one test per case, so a failing build names the case. The message says which way it failed, for example:
+
+```
+REGRESSION escape-010: did not call when it should have. Expected pass.
+REGRESSION missing-001: called when it should not have. Expected pass.
+```
+
+The directions are the same as in the run summary: called when it should not have, did not call when it should have, wrong call, and other fails. One more test, `test_direction_counts`, fails if any direction has more fails than the baseline allows.
+
+### What the shipped example run shows
+
+By default the check reads `examples/responses.example.json`. That file records answers for only 3 of the 10 cases. Two pass. `type-001` fails on purpose, because it sends the number 5 as the string "5". The other 7 cases have no recorded answer, so they fail as "no response".
+
+These 8 known fails are listed in `tests/fixtures/ci_baseline.json`. pytest reports them as `xfailed`, not as passes. The shipped run ends with `4 passed, 8 xfailed`: 2 cases, the direction count test, and the dummy vector test. A green build here means "nothing got worse than the baseline". It does not mean all 10 cases pass.
+
+### Point it at your own agent's recorded outputs
+
+1. Record your agent's answers to the cases in one JSON file, in the same format as `examples/responses.example.json`:
+
+```json
+{"responses": [
+  {"case_id": "notool-001", "tool_calls": [], "text": "You're welcome!"},
+  {"case_id": "choice-003", "tool_calls": [{"name": "some_tool", "arguments": {"key": "value"}}], "text": ""}
+]}
+```
+
+One object per case id. `tool_calls` is a list of `{"name", "arguments"}`. `arguments` may be an object or a JSON string. The optional `raw` field works as described under "Adapter boundary".
+
+2. Commit the file, for example as `recorded/my_responses.json`, and set it in the workflow step:
+
+```yaml
+      - name: Run tests
+        env:
+          ATP_RESPONSES: recorded/my_responses.json
+        run: python -m pytest -v
+```
+
+With `ATP_RESPONSES` set and no baseline, every case must pass.
+
+3. If some cases fail today and you accept that for now, write a baseline on purpose, review it, and commit it:
+
+```
+ATP_RESPONSES=recorded/my_responses.json python3 tests/test_ci_recorded.py --write recorded/my_baseline.json
+```
+
+Then add `ATP_BASELINE: recorded/my_baseline.json` next to `ATP_RESPONSES`. A case in the baseline that starts to pass also fails the build, with a note to update the baseline. That keeps the baseline honest.
+
+`ATP_CASES` points at a different case folder if you keep cases elsewhere. Paths are relative to the folder you run pytest from.
+
+### Limits
+
+- Recorded outputs only test what you recorded. If you change a prompt, a model or a tool list, record again, or the check still scores the old answers.
+- It does not call a model. Keeping the recordings current is your job, with your own agent and your own key, outside this check.
+- Ten cases are a smoke test, not a ranking.
+
+### promptfoo and other tools
+
+We have not tested this alongside promptfoo. As far as we know, promptfoo has a check that a tool call matches the tool's schema. These cases test something different: the decision whether to call a tool at all, which tool, and in some cases the reply text. They do not replace a schema check, and a schema check does not replace them.
+
+If you want the cases in another tool, you can convert them yourself. Each case has `messages`, `tools` and `expected` in plain JSON. A recorded responses file is a list of `case_id`, `tool_calls` and `text`. A short script can write those into the other tool's test format. We do not ship such an export, and we do not claim the results would be the same.
+
+### What the larger set adds
+
+The larger set uses the same runner, folder layout and responses format, so the same check should work on it. We have not run `tests/test_ci_recorded.py` against it yet. Compared with this sample, it has:
+
+- 130 cases in 12 themes, instead of 10 cases with one per theme.
+- `scripts/audit_cases.py`, which runs five naive agents (never call, always call the first tool, empty reply, and others) and lists any case they pass.
+- 44 unit tests for the runner, and stored pass or fail vectors for the dummy and naive agents.
 
 ## Dummy vector test
 
