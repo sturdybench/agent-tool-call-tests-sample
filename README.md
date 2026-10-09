@@ -1,12 +1,30 @@
 # agent-tool-call-tests-sample
 
-Version 1.5. See CHANGELOG.md.
+Version 1.6. See CHANGELOG.md.
 
 Ten test cases and a small runner that check the tool-calling decisions of an AI agent or MCP server. Each case gives your agent a conversation and a list of tools. The runner checks whether the agent called the right tool, with the right arguments, or correctly made no tool call.
 
 Version 1.5 adds 10 more cases for a filesystem tool set in `cases/mcp-filesystem/`. See "MCP filesystem cases" below.
 
 It needs Python 3.8 or newer and nothing else. No network, no API key, no signup.
+
+## What this tests
+
+Each line is a theme with its case file. Ten themes in `cases/`, one case each (10 cases). Four themes in `cases/mcp-filesystem/`, 10 more cases (20 cases in all).
+
+- Ambiguous request: `cases/ambiguous-request.json`
+- Argument escaping: `cases/argument-escaping.json`
+- Correct tool choice: `cases/correct-tool-choice.json`
+- Missing required argument: `cases/missing-required-argument.json`
+- Multi-step order: `cases/multi-step-order.json`
+- No tool needed: `cases/no-tool-needed.json`
+- Parallel calls: `cases/parallel-calls.json`
+- Tool error recovery: `cases/tool-error-recovery.json`
+- Unsafe request refusal: `cases/unsafe-request-refusal.json`
+- Wrong type: `cases/wrong-type.json`
+- MCP filesystem (mcp-filesystem): `cases/mcp-filesystem/` with must-not-call, correct-call, path-handling and missing-argument
+
+For AI agents: read AGENTS.md in this repo and https://sturdybench.com/llms.txt for a short machine-readable summary.
 
 ## Quick start
 
