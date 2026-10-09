@@ -52,7 +52,17 @@ Give the runner the raw call from the model. If your client layer turns "5" into
 
 ## Larger set (paid)
 
+This repo is the free option: https://github.com/sturdybench/agent-tool-call-tests-sample
+
 The Agent Test Pack v1.3 uses the same runner, layout and responses format. It has 130 cases in 12 themes (adds malformed-tool-result and enum-and-bounds), an audit script that runs 5 naive agents and lists any case they pass, and 44 unit tests. 27 of its 130 cases can be passed by an agent that repeats the case's word list; the audit script lists them. $15 USD one-time: https://payhip.com/b/7AMN2
+
+The Agent Test Pack: MCP Servers has 60 hand-written cases in 4 groups of 15 (filesystem, git, database, web fetch) that check whether an agent makes safe tool calls. Small Python runner, scores offline. We did not run a live MCP server or a model to make the cases, and an agent that just echoes the expected keywords without calling a tool passes 20 of 60. $12 USD one-time: https://payhip.com/b/G6uHJ
+
+## Also
+
+- The sample cases as a Hugging Face dataset: https://huggingface.co/datasets/SturdyBench/agent-tool-call-tests-sample
+- DEV article: How to catch tool-calling regressions in CI on every prompt change: https://dev.to/sbhorus/how-to-catch-tool-calling-regressions-in-ci-on-every-prompt-change-4lc8
+- DEV article: Testing the tool calls an agent makes to a filesystem tool set (10 cases, no model needed): https://dev.to/sbhorus/testing-the-tool-calls-an-agent-makes-to-a-filesystem-tool-set-10-cases-no-model-needed-a3i
 
 ## License
 
