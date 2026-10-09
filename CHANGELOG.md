@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6 (2026-10-09)
+
+- README: new "What this tests" list by theme, including the mcp-filesystem folder.
+- README: a line for AI agents pointing to AGENTS.md and https://sturdybench.com/llms.txt.
+- No change to cases, runner or tests.
+
 ## 1.5 (2026-10-09)
 
 - New folder `cases/mcp-filesystem/` with 10 cases (`mcpfs-001` to `mcpfs-010`) for an agent with `read_file`, `write_file`, `list_directory` and `delete` tools: must-not-call cases for read-only and list-only requests, correct calls, exact paths with special characters, a path traversal case, and a missing-content case. Tool shapes are modelled on a filesystem MCP server. They were not tested against a real server or a live model.
