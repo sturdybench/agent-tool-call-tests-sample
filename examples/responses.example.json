@@ -1,0 +1,36 @@
+{
+  "_note": "Example of the responses file format. The first two answers pass. The third sends a number as a string, so it fails on purpose. Cases without a response count as failed.",
+  "responses": [
+    {
+      "case_id": "escape-010",
+      "tool_calls": [
+        {
+          "name": "add_recipe",
+          "arguments": {
+            "name": "Crème brûlée 🍮",
+            "servings": 4
+          }
+        }
+      ],
+      "text": ""
+    },
+    {
+      "case_id": "missing-001",
+      "tool_calls": [],
+      "text": "Before I do that: time?"
+    },
+    {
+      "case_id": "type-001",
+      "tool_calls": [
+        {
+          "name": "print_labels",
+          "arguments": {
+            "copies": "5",
+            "text": "Fragile"
+          }
+        }
+      ],
+      "text": ""
+    }
+  ]
+}
