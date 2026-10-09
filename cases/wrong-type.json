@@ -1,0 +1,75 @@
+{
+  "theme": "wrong-type",
+  "cases": [
+    {
+      "id": "type-001",
+      "theme": "wrong-type",
+      "description": "Spoken count becomes an integer.",
+      "tools": [
+        {
+          "name": "print_labels",
+          "description": "Print labels.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string"
+              },
+              "copies": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "text",
+              "copies"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "preview_label",
+          "description": "Preview a label.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "text"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ],
+      "messages": [
+        {
+          "role": "user",
+          "content": "Print five copies of the label Fragile."
+        }
+      ],
+      "expected": {
+        "type": "tool_calls",
+        "calls": [
+          {
+            "name": "print_labels",
+            "arguments": {
+              "copies": 5
+            },
+            "arguments_match": {
+              "text": {
+                "contains": "Fragile"
+              }
+            }
+          }
+        ],
+        "ordered": false,
+        "forbidden_tools": [
+          "preview_label"
+        ]
+      },
+      "scoring_note": "Pass means copies is integer 5, not the string five."
+    }
+  ]
+}

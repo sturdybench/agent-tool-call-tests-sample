@@ -1,0 +1,94 @@
+{
+  "theme": "multi-step-order",
+  "cases": [
+    {
+      "id": "order-001",
+      "theme": "multi-step-order",
+      "description": "Create a folder, then save a file with a known path inside it.",
+      "tools": [
+        {
+          "name": "create_folder",
+          "description": "Create a folder.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": ""
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "save_file",
+          "description": "Save text to a file.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": ""
+              },
+              "content": {
+                "type": "string",
+                "description": ""
+              }
+            },
+            "required": [
+              "path",
+              "content"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "list_files",
+          "description": "List files in a folder.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": ""
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ],
+      "messages": [
+        {
+          "role": "user",
+          "content": "Create the folder /home/sam/reports, then save a file at /home/sam/reports/q3.txt containing exactly: Draft"
+        }
+      ],
+      "expected": {
+        "type": "tool_calls",
+        "calls": [
+          {
+            "name": "create_folder",
+            "arguments": {
+              "path": "/home/sam/reports"
+            }
+          },
+          {
+            "name": "save_file",
+            "arguments": {
+              "path": "/home/sam/reports/q3.txt",
+              "content": "Draft"
+            }
+          }
+        ],
+        "ordered": true
+      },
+      "scoring_note": "Pass means both calls in order, folder first, because the path is already known."
+    }
+  ]
+}

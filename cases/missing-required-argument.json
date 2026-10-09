@@ -1,0 +1,72 @@
+{
+  "theme": "missing-required-argument",
+  "cases": [
+    {
+      "id": "missing-001",
+      "theme": "missing-required-argument",
+      "description": "Calendar event with no start time.",
+      "tools": [
+        {
+          "name": "create_event",
+          "description": "Create a calendar event.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string"
+              },
+              "start_time": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "date",
+              "start_time"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "list_events",
+          "description": "List events on a date.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "date"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ],
+      "messages": [
+        {
+          "role": "user",
+          "content": "Put a dentist appointment on my calendar for 2027-02-03."
+        }
+      ],
+      "expected": {
+        "type": "no_call",
+        "text_any": [
+          "time",
+          "what time",
+          "start"
+        ],
+        "forbidden_tools": [
+          "create_event",
+          "list_events"
+        ],
+        "text_any_in_question": true
+      },
+      "scoring_note": "Pass means no call and a question asking for the start time."
+    }
+  ]
+}

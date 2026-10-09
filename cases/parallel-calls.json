@@ -1,0 +1,87 @@
+{
+  "theme": "parallel-calls",
+  "cases": [
+    {
+      "id": "parallel-001",
+      "theme": "parallel-calls",
+      "description": "Weather in two cities.",
+      "tools": [
+        {
+          "name": "get_weather",
+          "description": "Get current weather for a city.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string"
+              },
+              "unit": {
+                "type": "string",
+                "enum": [
+                  "celsius",
+                  "fahrenheit"
+                ]
+              }
+            },
+            "required": [
+              "city",
+              "unit"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "convert_amount",
+          "description": "Convert an amount between currencies using a fixed table (arithmetic only).",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "number"
+              },
+              "from_currency": {
+                "type": "string"
+              },
+              "to_currency": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "amount",
+              "from_currency",
+              "to_currency"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ],
+      "messages": [
+        {
+          "role": "user",
+          "content": "What's the weather in Oslo and in Lima? Celsius for both."
+        }
+      ],
+      "expected": {
+        "type": "tool_calls",
+        "calls": [
+          {
+            "name": "get_weather",
+            "arguments": {
+              "city": "Oslo",
+              "unit": "celsius"
+            }
+          },
+          {
+            "name": "get_weather",
+            "arguments": {
+              "city": "Lima",
+              "unit": "celsius"
+            }
+          }
+        ],
+        "ordered": false
+      },
+      "scoring_note": "Pass if exactly two weather calls cover both cities in any order."
+    }
+  ]
+}

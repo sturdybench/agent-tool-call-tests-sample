@@ -1,0 +1,68 @@
+{
+  "theme": "argument-escaping",
+  "cases": [
+    {
+      "id": "escape-010",
+      "theme": "argument-escaping",
+      "description": "Emoji in a recipe name with an integer.",
+      "tools": [
+        {
+          "name": "add_recipe",
+          "description": "Save a recipe.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "servings": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "name",
+              "servings"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "search_notes",
+          "description": "Search notes by keyword.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ],
+      "messages": [
+        {
+          "role": "user",
+          "content": "Save a recipe named exactly \"Crème brûlée 🍮\" for 4 servings."
+        }
+      ],
+      "expected": {
+        "type": "tool_calls",
+        "calls": [
+          {
+            "name": "add_recipe",
+            "arguments": {
+              "name": "Crème brûlée 🍮",
+              "servings": 4
+            }
+          }
+        ],
+        "ordered": false
+      },
+      "scoring_note": "Pass if name is exact and servings is the integer 4."
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "theme": "correct-tool-choice",
+  "cases": [
+    {
+      "id": "choice-003",
+      "theme": "correct-tool-choice",
+      "description": "Complete a task by numeric id.",
+      "tools": [
+        {
+          "name": "add_task",
+          "description": "Add a todo item.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "complete_task",
+          "description": "Mark a todo item done.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "task_id": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "task_id"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "list_tasks",
+          "description": "List all todo items.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": [],
+            "additionalProperties": false
+          }
+        }
+      ],
+      "messages": [
+        {
+          "role": "user",
+          "content": "Mark task 42 as done."
+        }
+      ],
+      "expected": {
+        "type": "tool_calls",
+        "calls": [
+          {
+            "name": "complete_task",
+            "arguments": {
+              "task_id": 42
+            }
+          }
+        ],
+        "ordered": false,
+        "forbidden_tools": [
+          "add_task"
+        ]
+      },
+      "scoring_note": "Pass means complete_task with integer task_id 42."
+    }
+  ]
+}

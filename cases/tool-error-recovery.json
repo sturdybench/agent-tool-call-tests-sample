@@ -1,0 +1,100 @@
+{
+  "theme": "tool-error-recovery",
+  "cases": [
+    {
+      "id": "recover-001",
+      "theme": "tool-error-recovery",
+      "description": "Date format error; retry with ISO date.",
+      "tools": [
+        {
+          "name": "create_event",
+          "description": "Create a calendar event.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string",
+                "description": "YYYY-MM-DD"
+              },
+              "start_time": {
+                "type": "string",
+                "description": "HH:MM 24h"
+              }
+            },
+            "required": [
+              "title",
+              "date",
+              "start_time"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "search_notes",
+          "description": "Search notes.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string"
+              },
+              "limit": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "query",
+              "limit"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ],
+      "messages": [
+        {
+          "role": "user",
+          "content": "Put 'Team sync' on my calendar for March 12, 2027 at 14:00."
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "name": "create_event",
+              "arguments": {
+                "title": "Team sync",
+                "date": "12/03/2027",
+                "start_time": "14:00"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_name": "create_event",
+          "tool_call_id": "c1",
+          "content": "error: invalid date format, expected YYYY-MM-DD"
+        }
+      ],
+      "expected": {
+        "type": "tool_calls",
+        "calls": [
+          {
+            "name": "create_event",
+            "arguments": {
+              "title": "Team sync",
+              "date": "2027-03-12",
+              "start_time": "14:00"
+            }
+          }
+        ],
+        "ordered": true
+      },
+      "scoring_note": "Pass if the call is repeated with date 2027-03-12 and the other fields unchanged."
+    }
+  ]
+}

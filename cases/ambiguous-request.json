@@ -1,0 +1,65 @@
+{
+  "theme": "ambiguous-request",
+  "cases": [
+    {
+      "id": "ambig-001",
+      "theme": "ambiguous-request",
+      "description": "Delete or archive an old file.",
+      "tools": [
+        {
+          "name": "delete_file",
+          "description": "Permanently delete a file.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "archive_file",
+          "description": "Move a file to the archive folder.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ],
+      "messages": [
+        {
+          "role": "user",
+          "content": "Get rid of the old report."
+        }
+      ],
+      "expected": {
+        "type": "no_call",
+        "text_any": [
+          "delete",
+          "archive",
+          "report",
+          "permanent"
+        ],
+        "forbidden_tools": [
+          "delete_file",
+          "archive_file"
+        ],
+        "text_any_in_question": true
+      },
+      "scoring_note": "Pass means no call and a question about which report and whether to delete or archive."
+    }
+  ]
+}
