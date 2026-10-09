@@ -1,0 +1,30 @@
+# Tool-call regression check. Runs the recorded agent outputs against the cases on every
+# pull request and push. Offline: no model calls, no API key, no secrets.
+# Network use: only actions/checkout, actions/setup-python and "pip install pytest".
+name: tool-call-tests
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pytest
+        run: python -m pip install pytest
+      - name: Validate case files
+        run: python runner/atp.py validate
+      - name: Run tests
+        # To check your own recorded outputs, set them here, for example:
+        # env:
+        #   ATP_RESPONSES: recorded/my_responses.json
+        #   ATP_BASELINE: recorded/my_baseline.json
+        run: python -m pytest -v
