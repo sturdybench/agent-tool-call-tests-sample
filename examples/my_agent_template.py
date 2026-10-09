@@ -17,7 +17,14 @@ def my_agent(messages, tools):
     tools:    list of {"name", "description", "parameters": <JSON Schema>}
     Return (tool_calls, text). Convert tools to your provider's format here.
     """
-    # TODO: call your agent here (this template makes no API calls).
+    # Replace this stub with a call to your agent. This template makes no API calls.
+    #
+    # Optional: to show the runner what the model really returned, add a "raw" field
+    # to the response in main(), next to tool_calls and text:
+    #   {"case_id": "...", "tool_calls": [...], "text": "...",
+    #    "raw": {"tool_calls": [{"name": "...", "arguments": "{\"qty\": \"5\"}"}]}}
+    # Put the model's original tool calls in raw, before any client code changes them.
+    # When raw is present the runner scores raw instead of tool_calls.
     return [], "stub: no tool calls"
 
 

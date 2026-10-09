@@ -1,5 +1,6 @@
 {
   "_note": "Example of the responses file format. The first two answers pass. The third sends a number as a string, so it fails on purpose. Cases without a response count as failed.",
+  "_raw_example": {"note": "Optional raw field, not part of the responses above. raw holds the model's original call, where qty is the string \"5\". tool_calls holds the normalized call, where qty is 5. The runner scores raw, so it fails a case that needs a number, and the report marks adapter_diff.", "case_id": "example-001", "tool_calls": [{"name": "add_to_cart", "arguments": {"item": "pen", "qty": 5}}], "text": "", "raw": {"tool_calls": [{"name": "add_to_cart", "arguments": "{\"item\": \"pen\", \"qty\": \"5\"}"}]}},
   "responses": [
     {
       "case_id": "escape-010",

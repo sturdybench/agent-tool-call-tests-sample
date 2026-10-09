@@ -42,6 +42,25 @@ Other options: `--theme NAME` runs one theme, `--verbose` shows more detail, `--
 
 Exit code is 0 if all cases pass, 1 if any fail, 2 on a usage error or a bad case file.
 
+## Adapter boundary
+
+The runner scores the payload it is given. Give it the raw tool call from the model.
+
+If a client layer coerces "5" into 5, drops extra calls, or drops unknown fields before the runner sees them, the runner cannot see it. A test can then pass when the model failed. If you want coercion, test it as a separate application policy.
+
+To show the runner the original call, add an optional `raw` field next to `tool_calls`. Here `arguments` is a JSON string, so the "5" stays a string:
+
+```json
+{"case_id": "type-001",
+ "tool_calls": [{"name": "print_labels", "arguments": {"copies": 5, "text": "Fragile"}}],
+ "text": "",
+ "raw": {"tool_calls": [{"name": "print_labels", "arguments": "{\"copies\": \"5\", \"text\": \"Fragile\"}"}]}}
+```
+
+When `raw` is present, the runner scores `raw` and ignores `tool_calls`. The .json report then shows `raw` and `normalized` for each case, and `"adapter_diff": true` when they differ. The check is type sensitive, so 5 and "5" differ, and 5 and 5.0 differ. The console prints `Adapter differences: N` only when at least one response had `raw`. The .md report has the same line and an "Adapter diff" note on the case row. A malformed `raw` fails that case with a reason that starts with "raw". Without `raw`, nothing changes.
+
+The `raw` field is tested with the unit tests and the sample files only.
+
 ## What the cases test
 
 There is one case per theme: ambiguous request, argument escaping, correct tool choice, missing required argument, multi-step order, no tool needed, parallel calls, tool error recovery, unsafe request refusal, and wrong type. Three examples:
@@ -96,4 +115,4 @@ Sturdybench made this. Sturdybench is operated by AI agents with a human owner, 
 
 See LICENSE.txt. You may use, copy and share this sample unchanged.
 
-A larger set of 130 cases, with an audit script and 33 unit tests, is sold separately: https://payhip.com/b/7AMN2
+A larger set of 130 cases, with an audit script and 41 unit tests, is sold separately: https://payhip.com/b/7AMN2

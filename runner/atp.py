@@ -307,6 +307,35 @@ def normalize_calls(resp):
     return calls, None
 
 
+def scored_payload(resp):
+    """Return (payload, error). With the optional "raw" field, the raw tool calls are scored."""
+    if "raw" not in resp:
+        return resp, None
+    raw = resp["raw"]
+    if not isinstance(raw, dict):
+        return None, "raw is not a JSON object"
+    if not isinstance(raw.get("tool_calls", []), list):
+        return None, "raw tool_calls is not a list"
+    _, err = normalize_calls(raw)
+    if err:
+        return None, "raw " + err
+    payload = dict(resp)
+    del payload["raw"]
+    payload["tool_calls"] = raw.get("tool_calls", [])
+    return payload, None
+
+
+def adapter_diff(resp):
+    """True if raw and normalized tool calls differ. Type sensitive: 5, 5.0 and "5" all differ."""
+    if not isinstance(resp.get("raw"), dict):
+        return True
+    a, aerr = normalize_calls(resp["raw"])
+    b, berr = normalize_calls(resp)
+    if aerr or berr:
+        return True
+    return not strict_eq([[n, x] for n, x in a], [[n, x] for n, x in b], False)
+
+
 def check_matcher(value, m, schema):
     if "type" in m and not json_type_ok(value, m["type"]):
         return "expected type %s, got %s" % (m["type"], json_type_name(value))
@@ -403,6 +432,9 @@ def score(case, resp):
     reasons = []
     if not isinstance(resp, dict):
         return False, ["response is not a JSON object"]
+    resp, err = scored_payload(resp)
+    if err:
+        return False, [err]
     calls, err = normalize_calls(resp)
     if err:
         return False, [err]
@@ -496,6 +528,9 @@ def direction(case, resp, err, passed, reasons):
         return "pass"
     if err or not isinstance(resp, dict):
         return "other_fail"
+    resp, cerr = scored_payload(resp)
+    if cerr:
+        return "other_fail"
     calls, cerr = normalize_calls(resp)
     if cerr:
         return "other_fail"
@@ -519,10 +554,24 @@ def run_cases(cases, agent):
             passed, reasons = False, [err]
         else:
             passed, reasons = score(c, resp)
-        results.append({"id": c["id"], "theme": c["theme"], "passed": passed, "reasons": reasons,
-                        "description": c["description"], "scoring_note": c["scoring_note"],
-                        "direction": direction(c, resp, err, passed, reasons)})
+        r = {"id": c["id"], "theme": c["theme"], "passed": passed, "reasons": reasons,
+             "description": c["description"], "scoring_note": c["scoring_note"],
+             "direction": direction(c, resp, err, passed, reasons)}
+        if not err and isinstance(resp, dict) and "raw" in resp:
+            raw = resp["raw"]
+            r["raw"] = raw.get("tool_calls", []) if isinstance(raw, dict) else raw
+            r["normalized"] = resp.get("tool_calls", [])
+            if adapter_diff(resp):
+                r["adapter_diff"] = True
+        results.append(r)
     return results
+
+
+def adapter_count(results):
+    """None if no result had raw, else how many results have adapter_diff."""
+    if not any("raw" in r for r in results):
+        return None
+    return sum(1 for r in results if r.get("adapter_diff"))
 
 
 def summarize(results):
@@ -555,16 +604,23 @@ def write_report(path, results, agent_label):
         lines = ["# Agent Test Pack report", "", "Agent: %s" % agent_label, "",
                  "Total: %d/%d passed" % (p, n), "", direction_line(directions(results)), "",
                  "| Theme | Passed | Total |", "|---|---|---|"]
+        ac = adapter_count(results)
+        if ac is not None:
+            lines[8:8] = ["Adapter differences: %d" % ac, ""]
         for t, v in sorted(themes.items()):
             lines.append("| %s | %d | %d |" % (t, v["passed"], v["total"]))
         lines += ["", "| Case | Theme | Result | Reasons |", "|---|---|---|---|"]
         for r in results:
+            why = "; ".join(r["reasons"])
+            if r.get("adapter_diff"):
+                why = (why + "; " if why else "") + "Adapter diff: raw and normalized tool calls differ"
             lines.append("| %s | %s | %s | %s |" % (r["id"], r["theme"], "PASS" if r["passed"] else "FAIL",
-                                                   "; ".join(r["reasons"]).replace("|", "\\|").replace("\n", " ")))
+                                                   why.replace("|", "\\|").replace("\n", " ")))
         Path(path).write_text("\n".join(lines) + "\n", encoding="utf-8")
     elif str(path).lower().endswith(".json"):
         out = {"agent": agent_label, "total": n, "passed": p, "themes": themes,
-               "cases": [{k: r[k] for k in ("id", "theme", "passed", "reasons", "direction")} for r in results],
+               "cases": [{k: r[k] for k in ("id", "theme", "passed", "reasons", "direction",
+                                            "raw", "normalized", "adapter_diff") if k in r} for r in results],
                "directions": directions(results)}
         Path(path).write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
     else:
@@ -636,6 +692,9 @@ def main(argv=None):
             print("%-28s %d/%d" % (t, v["passed"], v["total"]))
         print("%d/%d passed" % (p, n))
         print(direction_line(directions(results)))
+        ac = adapter_count(results)
+        if ac is not None:
+            print("Adapter differences: %d" % ac)
         if args.report:
             write_report(args.report, results, label)
         return 0 if p == n else 1
