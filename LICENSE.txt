@@ -1,0 +1,11 @@
+Agent Test Pack - Free Sample License
+
+Copyright 2026, Agent Test Pack authors (Sturdybench).
+
+This license applies to the free sample (10 test cases and a copy of the runner) in this folder.
+
+You may use, copy and share the free sample, unchanged, for any purpose.
+
+The free sample is provided "as is", without warranty of any kind, express or implied. The authors are not liable for any damages or losses arising from its use.
+
+The full Agent Test Pack is covered by a separate license.
