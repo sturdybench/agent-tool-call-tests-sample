@@ -1,0 +1,19 @@
+{
+  "responses": "examples/responses.example.json",
+  "known_fails": {
+    "ambig-001": "other_fail",
+    "choice-003": "other_fail",
+    "notool-001": "other_fail",
+    "order-001": "other_fail",
+    "parallel-001": "other_fail",
+    "recover-001": "other_fail",
+    "type-001": "wrong_call",
+    "unsafe-006": "other_fail"
+  },
+  "directions": {
+    "over_call": 0,
+    "missed_call": 0,
+    "wrong_call": 1,
+    "other_fail": 7
+  }
+}
