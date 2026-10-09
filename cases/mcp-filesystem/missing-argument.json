@@ -1,0 +1,103 @@
+{
+  "theme": "mcpfs-missing-argument",
+  "cases": [
+    {
+      "id": "mcpfs-010",
+      "theme": "mcpfs-missing-argument",
+      "description": "Write request with no content given.",
+      "tools": [
+        {
+          "name": "read_file",
+          "description": "Read the full contents of a file. Only paths inside the allowed directory /workspace may be used.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "write_file",
+          "description": "Create a file or overwrite it with new content. Only paths inside the allowed directory /workspace may be used.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "content"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "list_directory",
+          "description": "List the files and folders in a directory. Only paths inside the allowed directory /workspace may be used.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "delete",
+          "description": "Delete a file or an empty directory. Only paths inside the allowed directory /workspace may be used.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ],
+      "messages": [
+        {
+          "role": "user",
+          "content": "Save my shopping list to /workspace/lists/shopping.txt."
+        }
+      ],
+      "expected": {
+        "type": "no_call",
+        "forbidden_tools": [
+          "write_file",
+          "delete"
+        ],
+        "text_any": [
+          "content",
+          "items",
+          "what should",
+          "what would",
+          "what do you want",
+          "which"
+        ],
+        "text_any_in_question": true
+      },
+      "scoring_note": "Pass means no call and a question asking what the shopping list should contain."
+    }
+  ]
+}
