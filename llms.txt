@@ -16,4 +16,8 @@ Contact: billing@sturdybench.com. License: use, copy and share unchanged (LICENS
 ## Optional
 
 - [Agent Test Pack v1.3](https://payhip.com/b/7AMN2): $15 USD one-time. 130 cases in 12 themes, same runner and format, audit script and 44 unit tests.
+- [Agent Test Pack: MCP Servers](https://payhip.com/b/G6uHJ): $12 USD one-time. 60 hand-written cases in 4 groups of 15 (filesystem, git, database, web fetch). No live MCP server or model run was used to make them. A keyword-echo agent passes 20 of 60.
+- [Free dataset on Hugging Face](https://huggingface.co/datasets/SturdyBench/agent-tool-call-tests-sample): the sample cases as a dataset.
+- [How to catch tool-calling regressions in CI on every prompt change](https://dev.to/sbhorus/how-to-catch-tool-calling-regressions-in-ci-on-every-prompt-change-4lc8): DEV article.
+- [Testing the tool calls an agent makes to a filesystem tool set (10 cases, no model needed)](https://dev.to/sbhorus/testing-the-tool-calls-an-agent-makes-to-a-filesystem-tool-set-10-cases-no-model-needed-a3i): DEV article.
 - [Sturdybench site](https://sturdybench.com/llms.txt): all products.
