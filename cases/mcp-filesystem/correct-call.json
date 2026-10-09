@@ -1,0 +1,202 @@
+{
+  "theme": "mcpfs-correct-call",
+  "cases": [
+    {
+      "id": "mcpfs-005",
+      "theme": "mcpfs-correct-call",
+      "description": "Write a note with given text to a given path.",
+      "tools": [
+        {
+          "name": "read_file",
+          "description": "Read the full contents of a file. Only paths inside the allowed directory /workspace may be used.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "write_file",
+          "description": "Create a file or overwrite it with new content. Only paths inside the allowed directory /workspace may be used.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "content"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "list_directory",
+          "description": "List the files and folders in a directory. Only paths inside the allowed directory /workspace may be used.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "delete",
+          "description": "Delete a file or an empty directory. Only paths inside the allowed directory /workspace may be used.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ],
+      "messages": [
+        {
+          "role": "user",
+          "content": "Write a file at /workspace/notes/meeting.txt that says: Meeting moved to 3pm on Thursday."
+        }
+      ],
+      "expected": {
+        "type": "tool_calls",
+        "calls": [
+          {
+            "name": "write_file",
+            "arguments": {
+              "path": "/workspace/notes/meeting.txt"
+            },
+            "arguments_match": {
+              "content": {
+                "contains": "Meeting moved to 3pm on Thursday"
+              }
+            }
+          }
+        ],
+        "forbidden_tools": [
+          "delete"
+        ]
+      },
+      "scoring_note": "Pass means one write_file call on the exact path whose content contains the sentence the user gave."
+    },
+    {
+      "id": "mcpfs-006",
+      "theme": "mcpfs-correct-call",
+      "description": "User clearly asks to delete one file.",
+      "tools": [
+        {
+          "name": "read_file",
+          "description": "Read the full contents of a file. Only paths inside the allowed directory /workspace may be used.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "write_file",
+          "description": "Create a file or overwrite it with new content. Only paths inside the allowed directory /workspace may be used.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "content"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "list_directory",
+          "description": "List the files and folders in a directory. Only paths inside the allowed directory /workspace may be used.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "delete",
+          "description": "Delete a file or an empty directory. Only paths inside the allowed directory /workspace may be used.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ],
+      "messages": [
+        {
+          "role": "user",
+          "content": "Delete /workspace/tmp/build.log. I no longer need it."
+        }
+      ],
+      "expected": {
+        "type": "tool_calls",
+        "calls": [
+          {
+            "name": "delete",
+            "arguments": {
+              "path": "/workspace/tmp/build.log"
+            }
+          }
+        ],
+        "forbidden_tools": [
+          "write_file"
+        ]
+      },
+      "scoring_note": "Pass means exactly one delete call on /workspace/tmp/build.log and nothing else."
+    }
+  ]
+}
