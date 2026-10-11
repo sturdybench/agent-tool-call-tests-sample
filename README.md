@@ -1,30 +1,12 @@
 # agent-tool-call-tests-sample
 
-Version 1.6. See CHANGELOG.md.
+Version 1.7. See CHANGELOG.md.
 
 Ten test cases and a small runner that check the tool-calling decisions of an AI agent or MCP server. Each case gives your agent a conversation and a list of tools. The runner checks whether the agent called the right tool, with the right arguments, or correctly made no tool call.
 
-Version 1.5 adds 10 more cases for a filesystem tool set in `cases/mcp-filesystem/`. See "MCP filesystem cases" below.
+Version 1.7 fixes three weak spots in the CI baseline check. See "Baseline file checks" below. Version 1.5 added 10 more cases for a filesystem tool set in `cases/mcp-filesystem/`. See "MCP filesystem cases" below.
 
 It needs Python 3.8 or newer and nothing else. No network, no API key, no signup.
-
-## What this tests
-
-Each line is a theme with its case file. Ten themes in `cases/`, one case each (10 cases). Four themes in `cases/mcp-filesystem/`, 10 more cases (20 cases in all).
-
-- Ambiguous request: `cases/ambiguous-request.json`
-- Argument escaping: `cases/argument-escaping.json`
-- Correct tool choice: `cases/correct-tool-choice.json`
-- Missing required argument: `cases/missing-required-argument.json`
-- Multi-step order: `cases/multi-step-order.json`
-- No tool needed: `cases/no-tool-needed.json`
-- Parallel calls: `cases/parallel-calls.json`
-- Tool error recovery: `cases/tool-error-recovery.json`
-- Unsafe request refusal: `cases/unsafe-request-refusal.json`
-- Wrong type: `cases/wrong-type.json`
-- MCP filesystem (mcp-filesystem): `cases/mcp-filesystem/` with must-not-call, correct-call, path-handling and missing-argument
-
-For AI agents: read AGENTS.md in this repo and https://sturdybench.com/llms.txt for a short machine-readable summary.
 
 ## Quick start
 
@@ -126,13 +108,23 @@ REGRESSION escape-010: did not call when it should have. Expected pass.
 REGRESSION missing-001: called when it should not have. Expected pass.
 ```
 
-The directions are the same as in the run summary: called when it should not have, did not call when it should have, wrong call, and other fails. One more test, `test_direction_counts`, fails if any direction has more fails than the baseline allows.
+The directions are the same as in the run summary: called when it should not have, did not call when it should have, wrong call, and other fails. `test_direction_counts` fails if the live run has more fails in any direction than the baseline allows. The allowance is counted from the baseline's `known_fails`.
+
+### Baseline file checks
+
+A baseline file has two parts: `known_fails` (case id and direction) and `directions` (the fail total per direction). Three checks keep them honest:
+
+- Every direction in `known_fails` must be `over_call`, `missed_call`, `wrong_call` or `other_fail`. A typo such as `"wrongcall"` stops the run with one line that names the file, the case id, the bad value and the valid values. Before 1.7 it crashed with a `KeyError`.
+- `test_baseline_totals_match_known_fails` fails if the stored `directions` totals differ from the totals counted from `known_fails`. The message names the direction, the stored value and the counted value. Before 1.7 nothing read the stored totals, so they could go stale.
+- `test_direction_counts` compares the live run with the allowance from `known_fails`. It catches a count that rose beyond the baseline, and with the totals check it ties the stored totals to `known_fails`. It is not an independent check: the per-case tests already catch the same regressions, and if you edit `known_fails` and `directions` together, both still pass. Review baseline edits like code.
+
+`tests/ci_baseline.py` holds the shared reader. `tests/test_ci_baseline_file.py` tests it with temporary files and runs without pytest.
 
 ### What the shipped example run shows
 
 By default the check reads `examples/responses.example.json`. That file records answers for only 3 of the 10 cases. Two pass. `type-001` fails on purpose, because it sends the number 5 as the string "5". The other 7 cases have no recorded answer, so they fail as "no response".
 
-These 8 known fails are listed in `tests/fixtures/ci_baseline.json`. pytest reports them as `xfailed`, not as passes. The shipped run ends with `4 passed, 8 xfailed`: 2 cases, the direction count test, and the dummy vector test. A green build here means "nothing got worse than the baseline". It does not mean all 10 cases pass.
+These 8 known fails are listed in `tests/fixtures/ci_baseline.json`. pytest reports them as `xfailed`, not as passes. `tests/test_ci_recorded.py` ends with `4 passed, 8 xfailed`: 2 cases, the totals check and the direction count test. The full shipped run, `python -m pytest`, ends with `19 passed, 11 xfailed`. That adds the MCP filesystem file (7 cases and its 2 baseline tests pass, 3 xfailed), the dummy vector test and 5 baseline file tests. A green build here means "nothing got worse than the baseline". It does not mean all 10 cases pass.
 
 ### Point it at your own agent's recorded outputs
 
