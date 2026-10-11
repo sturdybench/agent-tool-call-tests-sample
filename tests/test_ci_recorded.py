@@ -23,7 +23,9 @@ ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_RESPONSES = ROOT / "examples" / "responses.example.json"
 DEFAULT_BASELINE = Path(__file__).resolve().parent / "fixtures" / "ci_baseline.json"
 sys.path.insert(0, str(ROOT / "runner"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 import atp  # noqa: E402
+from ci_baseline import BaselineError, load_baseline, read_baseline, stale_totals, totals  # noqa: E402
 
 WORDS = {
     "over_call": "called when it should not have",
@@ -59,14 +61,6 @@ def run():
     return cases, results, responses, baseline
 
 
-def load_baseline(path):
-    """Return {case_id: direction} for cases expected to fail. Missing file means every case must pass."""
-    if path is None:
-        return {}
-    data = json.loads(Path(path).read_text(encoding="utf-8"))
-    return dict(data.get("known_fails", {}))
-
-
 def baseline_doc(results, responses):
     fails = {r["id"]: r["direction"] for r in results if not r["passed"]}
     try:
@@ -90,7 +84,13 @@ except ImportError:  # plain "python3 -m unittest discover tests" without pytest
     raise unittest.SkipTest("test_ci_recorded.py needs pytest: pip install pytest")
 
 CASES, RESULTS, RESPONSES, BASELINE = run()
-KNOWN = load_baseline(BASELINE)
+try:
+    KNOWN = load_baseline(BASELINE)
+    BAD_BASELINE = None
+except BaselineError as e:  # a typo such as "wrongcall": one readable line, no KeyError later
+    BAD_BASELINE = str(e)
+if BAD_BASELINE:
+    pytest.fail(BAD_BASELINE, pytrace=False)
 BY_ID = {r["id"]: r for r in RESULTS}
 
 
@@ -120,13 +120,21 @@ def test_case(case_id):
     pytest.fail(failure_message(r, want))
 
 
+def test_baseline_totals_match_known_fails():
+    """The stored "directions" totals must equal the totals computed from known_fails."""
+    if BASELINE is None:
+        return
+    stale = stale_totals(read_baseline(BASELINE))
+    assert not stale, "baseline %s has stale direction totals:\n  %s\n  Fix the totals or rewrite " \
+        "the baseline with --write." % (BASELINE, "\n  ".join(stale))
+
+
 def test_direction_counts():
-    """Fail counts per direction must not exceed the baseline's counts."""
+    """Live fail counts per direction must not exceed the baseline's allowance.
+    The allowance is computed from known_fails, which test_baseline_totals_match_known_fails
+    ties to the stored totals. It is not independent of known_fails."""
     got = atp.directions(RESULTS)
-    want = dict.fromkeys(atp.DIRECTIONS, 0)
-    for d in KNOWN.values():
-        if d in want:
-            want[d] += 1
+    want = totals(KNOWN)
     over = ["%s: %d now, %d allowed" % (WORDS[k], got[k], want[k]) for k in atp.DIRECTIONS if got[k] > want[k]]
     assert not over, "more fails than the baseline allows:\n  " + "\n  ".join(over) + \
         "\n  " + atp.direction_line(got)
