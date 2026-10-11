@@ -1,10 +1,14 @@
 # Changelog
 
-## 1.6 (2026-10-09)
+## 1.7 (2026-10-11)
 
-- README: new "What this tests" list by theme, including the mcp-filesystem folder.
-- README: a line for AI agents pointing to AGENTS.md and https://sturdybench.com/llms.txt.
-- No change to cases, runner or tests.
+A reader reported three weak spots in the CI baseline check. All three were real. Changes:
+
+- A typo in a `known_fails` direction, for example `"wrongcall"`, crashed with a `KeyError` and a misleading count failure. Now the baseline reader checks every value and stops with one named line: the file, the case id, the bad value and the valid values. A value of `"pass"` is also refused.
+- The stored `directions` totals were never read, so they could go stale next to `known_fails`. New test `test_baseline_totals_match_known_fails` (in both CI test files) fails when they differ and names the direction, the stored value and the counted value.
+- `test_direction_counts` was described as if it were an independent check. It still compares the live run with the baseline, now using the checked `known_fails`. The README now says what it adds and what it does not.
+- New `tests/ci_baseline.py` (shared baseline reader, runs no tests) and `tests/test_ci_baseline_file.py` (5 tests with temporary baseline files; works with pytest and with `unittest discover`).
+- Full pytest run: 19 passed, 11 xfailed (1.5: 12 passed, 11 xfailed). No case changed. The runner is unchanged. The shipped baseline files are unchanged; their totals were already correct.
 
 ## 1.5 (2026-10-09)
 
