@@ -10,7 +10,6 @@ Rewrite the baseline on purpose, after you have reviewed the fails:
         python3 tests/test_ci_recorded.py --write tests/fixtures/ci_baseline_mcp_filesystem.json
 Run: python -m pytest
 """
-import json
 import sys
 from pathlib import Path
 
@@ -19,7 +18,9 @@ CASES_DIR = ROOT / "cases" / "mcp-filesystem"
 RESPONSES = ROOT / "examples" / "mcp-filesystem.responses.json"
 BASELINE = Path(__file__).resolve().parent / "fixtures" / "ci_baseline_mcp_filesystem.json"
 sys.path.insert(0, str(ROOT / "runner"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 import atp  # noqa: E402
+from ci_baseline import BaselineError, load_baseline, read_baseline, stale_totals, totals  # noqa: E402
 
 try:
     import pytest  # noqa: E402
@@ -37,7 +38,13 @@ WORDS = {
 
 CASES = atp.load_cases(str(CASES_DIR))
 RESULTS = atp.run_cases(CASES, atp.responses_agent(str(RESPONSES)))
-KNOWN = dict(json.loads(BASELINE.read_text(encoding="utf-8")).get("known_fails", {}))
+try:
+    KNOWN = load_baseline(BASELINE)
+    BAD_BASELINE = None
+except BaselineError as e:  # a typo such as "wrongcall": one readable line, no KeyError later
+    BAD_BASELINE = str(e)
+if BAD_BASELINE:
+    pytest.fail(BAD_BASELINE, pytrace=False)
 BY_ID = {r["id"]: r for r in RESULTS}
 
 
@@ -60,13 +67,19 @@ def test_case(case_id):
         head, "; ".join(r["reasons"]) or "none", r["scoring_note"], RESPONSES))
 
 
+def test_baseline_totals_match_known_fails():
+    """The stored "directions" totals must equal the totals computed from known_fails."""
+    stale = stale_totals(read_baseline(BASELINE))
+    assert not stale, "baseline %s has stale direction totals:\n  %s\n  Fix the totals or rewrite " \
+        "the baseline with --write." % (BASELINE.name, "\n  ".join(stale))
+
+
 def test_direction_counts():
-    """Fail counts per direction must not exceed the baseline's counts."""
+    """Live fail counts per direction must not exceed the baseline's allowance.
+    The allowance is computed from known_fails, which test_baseline_totals_match_known_fails
+    ties to the stored totals. It is not independent of known_fails."""
     got = atp.directions(RESULTS)
-    want = dict.fromkeys(atp.DIRECTIONS, 0)
-    for d in KNOWN.values():
-        if d in want:
-            want[d] += 1
+    want = totals(KNOWN)
     over = ["%s: %d now, %d allowed" % (WORDS[k], got[k], want[k]) for k in atp.DIRECTIONS if got[k] > want[k]]
     assert not over, "more fails than the baseline allows:\n  " + "\n  ".join(over) + \
         "\n  " + atp.direction_line(got)
