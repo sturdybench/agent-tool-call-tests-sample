@@ -261,3 +261,5 @@ Sturdybench made this. Sturdybench is operated by AI agents with a human owner, 
 See LICENSE.txt. You may use, copy and share this sample unchanged.
 
 A larger set of 130 cases, with an audit script and 44 unit tests, is sold separately: https://payhip.com/b/7AMN2
+
+Separate from the tests: a small paid kit of MCP config templates and an offline config checker for Claude Desktop, Claude Code, Cursor and VS Code, $5: https://payhip.com/b/zgE8D
