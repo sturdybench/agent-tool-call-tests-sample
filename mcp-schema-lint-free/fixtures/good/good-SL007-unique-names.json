@@ -1,0 +1,32 @@
+{
+  "result": {
+    "tools": [
+      {
+        "name": "a",
+        "description": "Does one thing.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "string",
+              "description": "A text value."
+            }
+          }
+        }
+      },
+      {
+        "name": "b",
+        "description": "Does one thing.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "y": {
+              "type": "string",
+              "description": "A text value."
+            }
+          }
+        }
+      }
+    ]
+  }
+}
