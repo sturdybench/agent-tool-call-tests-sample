@@ -1,0 +1,11 @@
+{
+  "tools": [
+    {
+      "name": "echo",
+      "description": "Does one thing.",
+      "inputSchema": {
+        "type": "string"
+      }
+    }
+  ]
+}
