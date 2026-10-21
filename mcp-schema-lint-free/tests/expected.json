@@ -1,0 +1,10 @@
+{
+  "bad/SL001-missing-type.json": {"rules": ["SL001"], "exit": 1},
+  "bad/SL001-type-string.json": {"rules": ["SL001"], "exit": 1},
+  "bad/SL004-array-no-items.json": {"rules": ["SL004"], "exit": 0},
+  "bad/SL004-nested-array.json": {"rules": ["SL004"], "exit": 0},
+  "bad/SL007-duplicate-name.json": {"rules": ["SL007"], "exit": 1},
+  "good/good-SL001-object-root.json": {"rules": [], "exit": 0},
+  "good/good-SL004-items.json": {"rules": [], "exit": 0},
+  "good/good-SL007-unique-names.json": {"rules": [], "exit": 0}
+}
