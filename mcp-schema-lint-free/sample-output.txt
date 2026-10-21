@@ -1,0 +1,45 @@
+$ python3 mcp_schema_lint.py fixtures/bad/SL001-missing-type.json
+mcp-schema-lint 1.0.0: fixtures/bad/SL001-missing-type.json
+tools: 1, payload: 144 bytes
+ERROR SL001 search/inputSchema: inputSchema has no type; set "type": "object"
+1 error(s), 0 warning(s)
+
+$ python3 mcp_schema_lint.py fixtures/bad/SL001-type-string.json
+mcp-schema-lint 1.0.0: fixtures/bad/SL001-type-string.json
+tools: 1, payload: 91 bytes
+ERROR SL001 echo/inputSchema/type: inputSchema type is "string", expected "object"
+1 error(s), 0 warning(s)
+
+$ python3 mcp_schema_lint.py fixtures/bad/SL004-array-no-items.json
+mcp-schema-lint 1.0.0: fixtures/bad/SL004-array-no-items.json
+tools: 1, payload: 129 bytes
+WARN  SL004 tag/inputSchema/properties/tags: array without items
+0 error(s), 1 warning(s)
+
+$ python3 mcp_schema_lint.py fixtures/bad/SL004-nested-array.json
+mcp-schema-lint 1.0.0: fixtures/bad/SL004-nested-array.json
+tools: 1, payload: 194 bytes
+WARN  SL004 batch/inputSchema/properties/job/properties/steps: array without items
+0 error(s), 1 warning(s)
+
+$ python3 mcp_schema_lint.py fixtures/bad/SL007-duplicate-name.json
+mcp-schema-lint 1.0.0: fixtures/bad/SL007-duplicate-name.json
+tools: 2, payload: 313 bytes
+ERROR SL007 search/name: tool name appears 2 times
+1 error(s), 0 warning(s)
+
+$ python3 mcp_schema_lint.py fixtures/good/good-SL001-object-root.json
+mcp-schema-lint 1.0.0: fixtures/good/good-SL001-object-root.json
+tools: 1, payload: 216 bytes
+0 error(s), 0 warning(s)
+
+$ python3 mcp_schema_lint.py fixtures/good/good-SL004-items.json
+mcp-schema-lint 1.0.0: fixtures/good/good-SL004-items.json
+tools: 1, payload: 341 bytes
+0 error(s), 0 warning(s)
+
+$ python3 mcp_schema_lint.py fixtures/good/good-SL007-unique-names.json
+mcp-schema-lint 1.0.0: fixtures/good/good-SL007-unique-names.json
+tools: 2, payload: 299 bytes
+0 error(s), 0 warning(s)
+
