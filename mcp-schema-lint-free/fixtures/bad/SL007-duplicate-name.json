@@ -1,0 +1,30 @@
+{
+  "tools": [
+    {
+      "name": "search",
+      "description": "Does one thing.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "q": {
+            "type": "string",
+            "description": "A text value."
+          }
+        }
+      }
+    },
+    {
+      "name": "search",
+      "description": "Does one thing.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "A text value."
+          }
+        }
+      }
+    }
+  ]
+}
