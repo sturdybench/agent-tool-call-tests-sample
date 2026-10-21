@@ -1,0 +1,36 @@
+{
+  "tools": [
+    {
+      "name": "tag",
+      "description": "Does one thing.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "A text value."
+            }
+          },
+          "pair": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "string",
+                "description": "A text value."
+              },
+              {
+                "type": "string",
+                "description": "A text value."
+              }
+            ]
+          }
+        },
+        "required": [
+          "tags"
+        ]
+      }
+    }
+  ]
+}
