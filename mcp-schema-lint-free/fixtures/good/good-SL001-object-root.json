@@ -1,0 +1,21 @@
+{
+  "tools": [
+    {
+      "name": "fetch",
+      "description": "Does one thing.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "A text value."
+          },
+          "path": {
+            "type": "string",
+            "description": "A text value."
+          }
+        }
+      }
+    }
+  ]
+}
