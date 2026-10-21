@@ -1,0 +1,22 @@
+{
+  "tools": [
+    {
+      "name": "batch",
+      "description": "Does one thing.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "job": {
+            "type": "object",
+            "properties": {
+              "steps": {
+                "type": "array",
+                "description": "Steps."
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
